@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
     foreign_key: :author_id,
     primary_key: :id
   )
+
   has_many(
     :responses,
     class_name: "Response",

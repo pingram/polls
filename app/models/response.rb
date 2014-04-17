@@ -13,5 +13,4 @@ class Response < ActiveRecord::Base
     primary_key: :id
   )
 
-
 end
