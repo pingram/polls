@@ -19,8 +19,7 @@ class User < ActiveRecord::Base
 
   def completed_polls
 
-    answered_q_ids = self.questions_answered.map(&:id) # !
-    # have we answered every q in a poll?
+    # all the polls that we've answered a question in, plus the questions we've answered!
 
     query = <<-SQL
     SELECT
@@ -31,28 +30,32 @@ class User < ActiveRecord::Base
     questions
     ON
     polls.id = questions.poll_id
+    JOIN
+    answer_choices AS ac
+    ON
+    ac.question_id = questions.id
+    JOIN
+    responses
+    ON
+    responses.answer_choice_id = ac.id
     WHERE
-    questions.id IN (#{answered_q_ids.map(&:to_s).join(', ')})
+    responses.user_id = #{self.id}
     GROUP BY
     polls.id
     SQL
 
     answered_polls = Poll.find_by_sql(query)
 
-    answered_polls.map(&:q_count)
+    # all the polls with their question count!
 
     poll_questions = Poll.all.includes(:questions)
 
-    result = []
-
-    poll_questions.each do |pq|
+    poll_questions.each.with_object([]) do |pq, completed|
       ans_pol = answered_polls.select {|poll| poll.id == pq.id}.first
       if !ans_pol.nil? && pq.questions.length == ans_pol.q_count
-        result << pq
+        completed << pq
       end
     end
-
-    result
 
     # for each poll, we want to get the questions
 
