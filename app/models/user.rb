@@ -15,4 +15,6 @@ class User < ActiveRecord::Base
     primary_key: :id
   )
 
+  has_many :questions_answered, through: :responses, source: :question
+
 end

@@ -14,4 +14,5 @@ class AnswerChoice < ActiveRecord::Base
     foreign_key: :answer_choice_id,
     primary_key: :id
   )
+
 end
