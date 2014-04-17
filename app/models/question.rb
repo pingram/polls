@@ -15,4 +15,16 @@ class Question < ActiveRecord::Base
     primary_key: :id
   )
 
+  def results
+    answer_choices_with_count = self
+      .answer_choices
+      .select("answer_choices.*, COUNT(*) AS response_count")
+      .joins(:responses)
+      .group("answer_choices.id")
+
+    answer_choices_with_count.each.with_object({}) do |ac, results|
+      results[ac.text] = ac.response_count
+    end
+  end
+
 end
