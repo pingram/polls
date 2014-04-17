@@ -64,5 +64,5 @@ Response.create!(answer_choice_id: ac4.id, user_id: andre.id)
 Response.create!(answer_choice_id: ac5.id, user_id: jill.id)
 Response.create!(answer_choice_id: ac6.id, user_id: jill.id)
 
-Response.create!(answer_choice_id: ac7.id, user_id: andre.id)
-Response.create!(answer_choice_id: ac8.id, user_id: andre.id)
+Response.create!(answer_choice_id: ac7.id, user_id: joe.id)
+Response.create!(answer_choice_id: ac8.id, user_id: joe.id)
