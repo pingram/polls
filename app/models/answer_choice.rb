@@ -1,5 +1,6 @@
 class AnswerChoice < ActiveRecord::Base
   validates :question_id, :text, presence: true
+  before_destroy :destroy_responses
 
   belongs_to(
     :question,
@@ -14,5 +15,9 @@ class AnswerChoice < ActiveRecord::Base
     foreign_key: :answer_choice_id,
     primary_key: :id
   )
+
+  def destroy_responses
+    self.responses.map(&:destroy!)
+  end
 
 end

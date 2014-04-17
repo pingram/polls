@@ -66,3 +66,5 @@ Response.create!(answer_choice_id: ac6.id, user_id: jill.id)
 
 Response.create!(answer_choice_id: ac7.id, user_id: joe.id)
 Response.create!(answer_choice_id: ac8.id, user_id: joe.id)
+
+Response.create!(answer_choice_id: ac1.id, user_id: jill.id)
