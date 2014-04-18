@@ -48,20 +48,10 @@ class User < ActiveRecord::Base
 
     # all the polls with their question count!
 
-    all_query = <<-SQL
-      SELECT
-        polls.*, COUNT(*) AS q_count
-      FROM
-        polls
-      JOIN
-        questions
-      ON
-        polls.id = questions.poll_id
-      GROUP BY
-        polls.id
-    SQL
+    poll_questions = Poll.select("polls.*, COUNT(*) AS q_count")
+                    .joins(:questions).group("polls.id")
 
-    poll_questions = Poll.find_by_sql(all_query)
+    # poll_questions = Poll.find_by_sql(all_query)
 
     poll_questions.each.with_object([]) do |pq, completed|
       ans_pol = answered_polls.select { |poll| poll.id == pq.id }.first
