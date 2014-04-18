@@ -21,37 +21,49 @@ class User < ActiveRecord::Base
 
     # all the polls that we've answered a question in, plus the questions we've answered!
 
-    answered_query = <<-SQL
-      SELECT
-        polls.*, COUNT(*) AS q_count
-      FROM
-        polls
-      JOIN
-        questions
-      ON
-        polls.id = questions.poll_id
-      JOIN
-        answer_choices AS ac
-      ON
-        ac.question_id = questions.id
-      JOIN
-        responses
-      ON
-        responses.answer_choice_id = ac.id
-      WHERE
-        responses.user_id = #{self.id}
-      GROUP BY
-        polls.id
-    SQL
+    # answered_query = <<-SQL
+#       SELECT
+#         polls.*, COUNT(*) AS q_count
+#       FROM
+#         polls
+#       JOIN
+#         questions
+#       ON
+#         polls.id = questions.poll_id
+#       JOIN
+#         answer_choices AS ac
+#       ON
+#         ac.question_id = questions.id
+#       JOIN
+#         responses
+#       ON
+#         responses.answer_choice_id = ac.id
+#       WHERE
+#         responses.user_id = #{self.id}
+#       GROUP BY
+#         polls.id
+#     SQL
 
-    answered_polls = Poll.find_by_sql(answered_query)
+    answered_polls =
+      Poll.select("polls.*, COUNT(*) AS q_count")
+          .joins( :questions, { :questions => [ :answer_choices, { :answer_choices => :responses } ] } )
+          .where("responses.user_id = #{self.id}")
+          .group("polls.id")
+
+    # .joins( :questions, { :questions => [ :answer_choices, { :answer_choices => :responses } ] } )
+
+    # this says, in English:
+
+    # We want to join with questions (a poll method), but then through questions, we want to join with answer_choices (a question method), but then through answer_choices, we want to join with responses (an answer_choice method).
+
 
     # all the polls with their question count!
 
-    poll_questions = Poll.select("polls.*, COUNT(*) AS q_count")
-                    .joins(:questions).group("polls.id")
+    poll_questions =
+      Poll.select("polls.*, COUNT(*) AS q_count")
+          .joins(:questions)
+          .group("polls.id")
 
-    # poll_questions = Poll.find_by_sql(all_query)
 
     poll_questions.each.with_object([]) do |pq, completed|
       ans_pol = answered_polls.select { |poll| poll.id == pq.id }.first
